@@ -21,17 +21,18 @@ import com.gs.fw.common.mithra.test.MithraTestResource;
 import org.junit.After;
 import org.junit.Before;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 public abstract class AbstractReladomoTest
 {
     private MithraTestResource mithraTestResource;
-
-    protected abstract String[] getTestDataFilenames();
 
     protected String getMithraConfigXmlFilename()
     {
         return "testconfig/TestMithraRuntimeConfig.xml";
     }
-
 
     @Before
     public void setUp() throws Exception
@@ -40,12 +41,30 @@ public abstract class AbstractReladomoTest
 
         final ConnectionManagerForTests connectionManager = ConnectionManagerForTests.getInstanceForDbName("testdb");
         this.mithraTestResource.createSingleDatabase(connectionManager);
-        for (String filename : this.getTestDataFilenames())
-        {
-            this.mithraTestResource.addTestDataToDatabase(filename, connectionManager);
-        }
-
         this.mithraTestResource.setUp();
+
+        mithraTestResource.getDatabaseObjectPerConnectionManager().get(connectionManager).forEach(mithraDatabaseObject -> {
+            executeSqlStatement("CREATE UNIQUE INDEX IF NOT EXISTS idx_0 ON PERSON (FIRST_NAME)", connectionManager.getConnection());
+        });
+    }
+
+    private static void executeSqlStatement(String query, Connection targetConn){
+        Statement stm = null;
+        try {
+            stm = targetConn.createStatement();
+            stm.execute(query);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            try {
+                stm.close();
+            }
+            catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @After
