@@ -24,16 +24,10 @@
     <ClassName>Person</ClassName>
     <DefaultTable>PERSON</DefaultTable>
 
-    <Attribute name="personId" javaType="int" columnName="PERSON_ID" primaryKey="true"
-               primaryKeyGeneratorStrategy="SimulatedSequence">
-        <SimulatedSequence sequenceName="Person"
-                           sequenceObjectFactoryName="sample.util.ObjectSequenceObjectFactory"
-                           hasSourceAttribute="false"
-                           batchSize="1"
-                           initialValue="1"
-                           incrementSize="1"/>
-    </Attribute>
+    <Attribute name="personId" javaType="int" columnName="PERSON_ID" primaryKey="true"/>
     <Attribute name="firstName"    javaType="String" columnName="FIRST_NAME"    nullable="false" maxLength="64"/>
     <Attribute name="lastName"    javaType="String" columnName="LAST_NAME"    nullable="false" maxLength="64"/>
     <Attribute name="country" javaType="String" columnName="COUNTRY" nullable="false" maxLength="48"/>
+
+    <Index name="idx_0" unique="true">firstName</Index>
 </MithraObject>
