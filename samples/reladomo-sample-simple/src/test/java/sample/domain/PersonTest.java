@@ -28,13 +28,12 @@ public class PersonTest
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonTest.class);
 
     @Test
-    public void testUniqueIndex() throws Exception {
+    public void uniqueIndexViolation() throws Exception {
 
         insertRow(1, "name 1");
         insertRow(2, "name 2");
 
         MithraManager.getInstance().executeTransactionalCommand(tx -> {
-
             updateFirstName("new name 1", 1);
             insertRow(3, "name 1");
             updateFirstName("new name 2",2);
@@ -42,6 +41,36 @@ public class PersonTest
             return null;
         });
     }
+
+    @Test
+    public void uniqueIndexWithUpdatesAboveInsert() throws Exception {
+
+        insertRow(1, "name 1");
+        insertRow(2, "name 2");
+
+        MithraManager.getInstance().executeTransactionalCommand(tx -> {
+            updateFirstName("new name 1", 1);
+            updateFirstName("new name 2",2);
+            insertRow(3, "name 1");
+
+            return null;
+        });
+    }
+
+    @Test
+    public void uniqueIndexWithoutBatchedUpdate() throws Exception {
+
+        insertRow(1, "name 1");
+        insertRow(2, "name 2");
+
+        MithraManager.getInstance().executeTransactionalCommand(tx -> {
+            updateFirstName("new name 1", 1);
+            insertRow(3, "name 1");
+
+            return null;
+        });
+    }
+
 
     private void insertRow(int id, String name) {
         Person person = new Person();
